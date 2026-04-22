@@ -1,0 +1,6 @@
+{
+  "name": "NexiSphere",
+  "description": "The next-generation social sphere for seamless connection and creative expression.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": []
+}

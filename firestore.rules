@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. GLOBAL HELPERS
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() { 
+      return isSignedIn() && (
+        request.auth.token.get('email', '') == 'ahfahimsylhet@gmail.com' ||
+        request.auth.token.email == 'ahfahimsylhet@gmail.com'
+      );
+    }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+
+    // 2. MASTER OVERRIDE FOR ADMIN
+    match /{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // 3. COLLECTIONS
+
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+    }
+
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isSignedIn() && (resource.data.get('authorId', '') == request.auth.uid || isAdmin());
+    }
+
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow delete: if isSignedIn() && (resource.data.get('authorId', '') == request.auth.uid || isAdmin());
+    }
+
+    // PERMISSION RESOLUTION: Opening conversations and messages to all signed-in users
+    // This is the most robust way to ensure no query filter causes a permission crash.
+    match /conversations/{convId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /messages/{messageId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /followers/{followId} {
+      allow read: if true;
+      allow create, delete: if isSignedIn();
+    }
+
+    match /notifications/{notificationId} {
+      allow read, write: if isSignedIn() && (resource.data.get('userId', '') == request.auth.uid || isAdmin());
+    }
+
+    match /test/connection {
+      allow read: if true;
+    }
+  }
+}

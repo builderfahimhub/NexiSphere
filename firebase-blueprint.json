@@ -1,0 +1,140 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "username": { "type": "string" },
+        "bio": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "isAdmin": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "followingCount": { "type": "number" },
+        "followersCount": { "type": "number" }
+      },
+      "required": ["uid", "displayName", "username", "createdAt"]
+    },
+    "Post": {
+      "title": "Post",
+      "description": "Social media post",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "content": { "type": "string" },
+        "authorId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorPhotoURL": { "type": "string" },
+        "mediaURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "likesCount": { "type": "number" },
+        "isPinned": { "type": "boolean" }
+      },
+      "required": ["id", "content", "authorId", "createdAt"]
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "Post comment",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "postId": { "type": "string" },
+        "content": { "type": "string" },
+        "authorId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorPhotoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "postId", "content", "authorId", "createdAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Direct message (text, image, voice, or file)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "text": { "type": "string" },
+        "mediaURL": { "type": "string" },
+        "type": { "type": "string", "enum": ["text", "image", "voice", "file"] },
+        "senderId": { "type": "string" },
+        "receiverId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "isRead": { "type": "boolean" }
+      },
+      "required": ["id", "type", "senderId", "receiverId", "createdAt"]
+    },
+    "Conversation": {
+      "title": "Conversation",
+      "description": "Chat conversation metadata",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "participants": { "type": "array", "items": { "type": "string" } },
+        "lastMessage": { "type": "string" },
+        "lastMessageAt": { "type": "string", "format": "date-time" },
+        "unreadCount": { "type": "object" },
+        "status": { "type": "string", "enum": ["pending", "accepted", "declined"] }
+      },
+      "required": ["id", "participants", "status"]
+    },
+    "Follow": {
+      "title": "Follow",
+      "description": "Follow relationship",
+      "type": "object",
+      "properties": {
+        "followerId": { "type": "string" },
+        "followingId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["followerId", "followingId", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "System notification",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "type": { "type": "string", "enum": ["message", "follow"] },
+        "fromId": { "type": "string" },
+        "fromName": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "isRead": { "type": "boolean" }
+      },
+      "required": ["id", "userId", "type", "fromId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Stores user profile data"
+    },
+    "/posts/{postId}": {
+      "schema": "Post",
+      "description": "Stores all social posts"
+    },
+    "/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Stores direct messages between users"
+    },
+    "/conversations/{convId}": {
+      "schema": "Conversation",
+      "description": "Stores conversation metadata and status"
+    },
+    "/followers/{followId}": {
+      "schema": "Follow",
+      "description": "Stores follow relationships (document ID: followerId_followingId)"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "Stores user notifications"
+    },
+    "/comments/{commentId}": {
+      "schema": "Comment",
+      "description": "Stores post comments"
+    }
+  }
+}
